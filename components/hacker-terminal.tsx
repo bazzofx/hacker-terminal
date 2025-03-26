@@ -12,24 +12,26 @@ export default function HackerTerminal() {
   const thoughtLogRef = useRef<HTMLDivElement>(null)
   const godmodeInputRef = useRef<HTMLTextAreaElement>(null)
   const apiStatusRef = useRef<HTMLDivElement>(null)
-// custom drop down buttons
-const [selectedTarget, setSelectedTarget] = useState("Linux");
-const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-const dropdownRef = useRef<HTMLDivElement>(null);
-const targets = ["Windows Active Directory", "Linux", "Windows 11", "Microsoft Azure Tenant", "Amazon AWS", "Cisco Router"];
+  
+  // custom drop down buttons
+  const [selectedTarget, setSelectedTarget] = useState("Linux")
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const targets = ["Windows Active Directory", "Linux", "Windows 11", "Microsoft Azure Tenant", "Amazon AWS", "Cisco Router"]
+  
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+        setIsDropdownOpen(false)
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
-   // Custom Dropdown Chocie Button Component
-   const TargetDropdown = () => (
+  // Custom Dropdown Chocie Button Component
+  const TargetDropdown = () => (
     <div className="relative" ref={dropdownRef}>
       <Button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -49,9 +51,9 @@ const targets = ["Windows Active Directory", "Linux", "Windows 11", "Microsoft A
                   : "text-[#33ff33]/80 hover:bg-[#33ff33]/10"
               }`}
               onClick={() => {
-                setSelectedTarget(target);
-                setIsDropdownOpen(false);
-                updateApiStatus(`Target changed to: ${target}`);
+                setSelectedTarget(target)
+                setIsDropdownOpen(false)
+                updateApiStatus(`Target changed to: ${target}`)
               }}
             >
               {target}
@@ -60,8 +62,8 @@ const targets = ["Windows Active Directory", "Linux", "Windows 11", "Microsoft A
         </div>
       )}
     </div>
-  );
-// Drop down choice button ends
+  )
+  // Drop down choice button ends
 
   const [sessionHistory, setSessionHistory] = useState<
     Array<{
@@ -228,16 +230,17 @@ const targets = ["Windows Active Directory", "Linux", "Windows 11", "Microsoft A
     }, 300000)
   }
 
-
-
-
-const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
+  const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
 
   const executeCommand = async (command: string) => {
-    let isSystemPwned = false;
+    let isSystemPwned = false
 
     const simulateCommandOutput = async (cmd: string, context: string) => {
-      await waitForNextCallWindow();
+      await waitForNextCallWindow()
+      // Debugging Api call time 
+      // var timeStartApiCall =  new Date().toISOString()
+      // updateApiStatus(timeStartApiCall)
+      // -------------------------------------------------------------- Debugging Api call time 
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -250,57 +253,71 @@ const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
           messages: [
             {
               role: "system",
-              content: `Simulate realistic ${selectedTarget} command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited, after a little bit of struggle. Command: ${cmd}`
+              content: `You are a penetration testing assistant. For any command given, respond with two parts separated by "|||":
+              1. The command output that should appear in the terminal (before the |||)
+              2. The hacker's thoughts/analysis that should appear in the thoughts window (after the |||)
+              
+              Simulate realistic ${selectedTarget} command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited after some effort.It needs to take the user input and translate into a command to continue the exploitation.`
             },
             {
               role: "user",
-              content: context
+              content:`${cmd}`
+              // content: `Context:\n${context}`
             }
           ],
           temperature: 0.3,
-          max_tokens: 500
+          max_tokens: 300
         })
-      });
-      return (await response.json()).choices[0].message.content;
-    };
+      })
+
+      const responseData = await response.json()
+      const fullResponse = responseData.choices[0].message.content
+      
+      // Split the response into command output and thoughts
+      const [commandOutput, thoughts] = fullResponse.split("|||").map((part: string) => part.trim())
+      
+      return {
+        commandOutput: commandOutput || "No command output received",
+        thoughts: thoughts || "Analyzing the output..."
+      }
+    }
 
     try {
-      const thought = `Executing: ${command}`;
-      const output = await simulateCommandOutput(
+      const { commandOutput, thoughts } = await simulateCommandOutput(
         command,
         `Session history:\n${JSON.stringify(sessionHistory.slice(-3), null, 2)}`
-      );
+      )
 
-      await addThought(thought);
-      await simulateTyping(command);
-      await streamOutput(output);
+      await addThought(thoughts)
+      await simulateTyping(command)
+      await streamOutput(commandOutput)
       
       setSessionHistory(prev => [
         ...prev,
         {
           command,
-          output,
-          thought,
+          output: commandOutput,
+          thought: thoughts,
           godmode_influence: command
         }
-      ]);
+      ])
 
-      if (output.includes("root access gained") || output.includes("credentials found") || output.includes("password found"))  {
-        await streamOutput("\n\nPWNED! -by Cyber Samurai\n");
-        isSystemPwned = true;
+      if (commandOutput.includes("root access gained") || commandOutput.includes("credentials found") || commandOutput.includes("password found"))  {
+        await streamOutput("\n\nPWNED! -by Cyber Samurai\n")
+        isSystemPwned = true
       }
 
-      return isSystemPwned;
+      return isSystemPwned
 
     } catch (error) {
-      console.error("Command error:", error);
-      await streamOutput(`\n\n[!] Command failed: ${error instanceof Error ? error.message : "Unknown error"}`);
-      return false;
+      console.error("Command error:", error)
+      await streamOutput(`\n\n[!] Command failed: ${error instanceof Error ? error.message : "Unknown error"}`)
+      return false
     }
-  };
+  }
 
   const initializeHackerSim = useCallback(async () => {
-    updateApiStatus("Simulated Hacking & Exploitation Lab (S.H.E.LL) Initialized...  Awaiting commands.");
+    updateApiStatus("Simulated Hacking & Exploitation Lab (S.H.E.LL) Initialized...  Awaiting commands.")
     const initialContent = `  Welcome to Kali Linux Rolling (GNU/Linux 6.1.0-kali7-amd64 x86_64)
 🐧 Terminal Design by CyberSamurai - https://cybersamurai.co.uk - 2025 🖤
 
@@ -308,11 +325,11 @@ const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
 ✟ Hacker Notes: https://bazzofx.github.io/notes/Kali/Kali-Commands
 ✟ Developer:    https://cybersamurai.co.uk
 
-System ready. Awaiting your commands...`;
+System ready. Awaiting your commands...`
 
     if (terminalRef.current) {
-      terminalRef.current.innerHTML = initialContent;
-      showInputLine();
+      terminalRef.current.innerHTML = initialContent
+      showInputLine()
     }
 
     setSessionHistory([{
@@ -320,23 +337,23 @@ System ready. Awaiting your commands...`;
       output: initialContent,
       thought: "System initialized. Ready for commands.",
       godmode_influence: ""
-    }]);
+    }])
 
-    await addThought("System initialized. Ready for commands.");
-  }, [addThought, showInputLine]);
+    await addThought("System initialized. Ready for commands.")
+  }, [addThought, showInputLine])
 
   const submitGodmodeCommand = async () => {
-    if (!godmodeInputRef.current) return;
+    if (!godmodeInputRef.current) return
 
-    const command = godmodeInputRef.current.value.trim();
+    const command = godmodeInputRef.current.value.trim()
     if (command) {
-      setGodmodeCommand(command);
-      godmodeInputRef.current.value = "";
+      setGodmodeCommand(command)
+      godmodeInputRef.current.value = ""
       
-      updateApiStatus(`Executing: ${command}`);
-      addGodModeThought(command);
+      updateApiStatus(`Executing: ${command}`)
+      addGodModeThought(command)
 
-      const wasPwned = await executeCommand(command);
+      const wasPwned = await executeCommand(command)
 
       toast({
         title: wasPwned ? "🚨 System Compromised!" : "🌱 Command Executed",
@@ -346,66 +363,61 @@ System ready. Awaiting your commands...`;
         variant: wasPwned ? "destructive" : "default", // If using shadcn/ui
         className: wasPwned ? "bg-red-600 text-white font-bold" : "bg-green-100  00 text-green-950 font-bold",
         duration: 5000, // Keep it visible for 5 seconds
-      });
+      })
 
       if (wasPwned) {
-        godmodeInputRef.current.disabled = true;
+        godmodeInputRef.current.disabled = true
       }
     }
-  };
+  }
 
   const handleGodmodeKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      submitGodmodeCommand();
+      e.preventDefault()
+      submitGodmodeCommand()
     }
-  };
+  }
 
   const toggleSound = () => {
-    setSoundEnabled((prev) => !prev);
-  };
+    setSoundEnabled((prev) => !prev)
+  }
 
   const toggleApiStatus = () => {
-    setShowApiStatus((prev) => !prev);
-  };
+    setShowApiStatus((prev) => !prev)
+  }
 
   useEffect(() => {
     typingSound1Ref.current = new Audio(
       "https://cdn.pixabay.com/download/audio/2022/03/24/audio_ef3fa634de.mp3?filename=keyboard-spacebar-hit-101812.mp3",
-    );
+    )
     typingSound2Ref.current = new Audio(
       "https://cdn.pixabay.com/download/audio/2022/03/15/audio_bca2811b06.mp3?filename=keyboard5-88069.mp3",
-    );
+    )
 
     if (!isInitialized) {
-      initializeHackerSim();
-      setIsInitialized(true);
+      initializeHackerSim()
+      setIsInitialized(true)
     }
 
     return () => {
       if (typingSound1Ref.current) {
-        typingSound1Ref.current.pause();
-        typingSound1Ref.current = null;
+        typingSound1Ref.current.pause()
+        typingSound1Ref.current = null
       }
       if (typingSound2Ref.current) {
-        typingSound2Ref.current.pause();
-        typingSound2Ref.current = null;
+        typingSound2Ref.current.pause()
+        typingSound2Ref.current = null
       }
-    };
-  }, [isInitialized, initializeHackerSim]);
+    }
+  }, [isInitialized, initializeHackerSim])
 
   return (
-
     <div className="p-4 lg:p-6 min-h-screen font-mono bg-[#0a0a0a] text-[#33ff33]">
-    <div className="main-container flex flex-col h-screen p-5 box-border bg-gradient-to-br from-black to-[#0a0a0a] bg-fixed">
-      <div className="flex justify-between items-center mb-7">
-        
-        <h1 className="text-[#00ff00] text-shadow-glow text-2xl md:text-3xl font-medium tracking-wider">
-        優秀 <a href="https://cybersamurai.co.uk" target="_blank" rel="noopener noreferrer">Cyber Samurai</a> - Simulated Hacking & Exploitation Lab (S.H.E.LL)
-        </h1>
-
-
-
+      <div className="main-container flex flex-col h-screen p-5 box-border bg-gradient-to-br from-black to-[#0a0a0a] bg-fixed">
+        <div className="flex justify-between items-center mb-7">
+          <h1 className="text-[#00ff00] text-shadow-glow text-2xl md:text-3xl font-medium tracking-wider">
+          優秀 <a href="https://cybersamurai.co.uk" target="_blank" rel="noopener noreferrer">Cyber Samurai</a> - Simulated Hacking & Exploitation Lab (S.H.E.LL)
+          </h1>
         </div>
 
         <div className="content-container flex flex-col md:flex-row flex-1 overflow-hidden gap-5">
@@ -456,20 +468,15 @@ System ready. Awaiting your commands...`;
       </div>
 
       <div id="control-buttons" className="fixed top-5 right-5 flex gap-4">
-        
         <Button
-            id="api-status-toggle"
-            onClick={toggleApiStatus}
-            className="bg-gray-800/20 text-white border border-white/50 px-3 py-2 text-sm cursor-pointer font-mono font-bold rounded-md transition-all duration-300 hover:bg-white/20 hover:shadow-[0_0_10px_rgba(255,255,255,0.5)] backdrop-blur-md"
-          >
-            {showApiStatus ? "Hide Debug Log" : "Show Debug Log"}
-          </Button>
-  
-          <TargetDropdown />
-        </div>
-
-
-
+          id="api-status-toggle"
+          onClick={toggleApiStatus}
+          className="bg-gray-800/20 text-white border border-white/50 px-3 py-2 text-sm cursor-pointer font-mono font-bold rounded-md transition-all duration-300 hover:bg-white/20 hover:shadow-[0_0_10px_rgba(255,255,255,0.5)] backdrop-blur-md"
+        >
+          {showApiStatus ? "Hide Debug Log" : "Show Debug Log"}
+        </Button>
+        <TargetDropdown />
+      </div>
 
       <audio
         id="typing-sound-1"
