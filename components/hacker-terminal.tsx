@@ -117,7 +117,7 @@ export default function HackerTerminal() {
 
   const addGodModeThought = useCallback((command: string) => {
     if (!thoughtLogRef.current) return
-    const thought = `Godmode Command: ${command}`
+    const thought = `Hacker: ${command}`
     thoughtLogRef.current.textContent += `\n${thought}\n\n`
     thoughtLogRef.current.scrollTop = thoughtLogRef.current.scrollHeight
   }, [])
@@ -153,7 +153,7 @@ export default function HackerTerminal() {
             clearInterval(typingInterval)
             resolve()
           }
-        }, 30)
+        }, 7) //How quickly the characters appear on the hacking terminal, lower means faster - highter number slower
       })
     },
     [soundEnabled]
@@ -257,12 +257,16 @@ export default function HackerTerminal() {
               1. The command output that should appear in the terminal (before the |||)
               2. The hacker's thoughts/analysis that should appear in the thoughts window (after the |||)
               
-              Simulate realistic ${selectedTarget} command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited after some effort.It needs to take the user input and translate into a command to continue the exploitation.`
+              Never, include on the response the user input again, only provide the command and the simulated response for that command.
+              Simulate realistic ${selectedTarget} command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited after some effort.It needs to take the user input and translate into a command to continue the exploitation.
+              If any input that is not recognised in English, or jiberish the response should be a joke related to cyber and hack while asking the user to focus in getting root access!
+              `
+            
             },
             {
               role: "user",
-              content:`${cmd}`
-              // content: `Context:\n${context}`
+              // content:`${cmd}`
+              content: `Context:\n${context}\n Command:${cmd}`
             }
           ],
           temperature: 0.3,
@@ -289,7 +293,7 @@ export default function HackerTerminal() {
       )
 
       await addThought(thoughts)
-      await simulateTyping(command)
+      await simulateTyping(commandOutput)
       await streamOutput(commandOutput)
       
       setSessionHistory(prev => [
@@ -378,10 +382,6 @@ System ready. Awaiting your commands...`
     }
   }
 
-  const toggleSound = () => {
-    setSoundEnabled((prev) => !prev)
-  }
-
   const toggleApiStatus = () => {
     setShowApiStatus((prev) => !prev)
   }
@@ -425,7 +425,7 @@ System ready. Awaiting your commands...`
             <div
               ref={terminalRef}
               id="terminal"
-              className="flex-grow bg-black/70 border border-[#33ff33]/50 p-4 shadow-[0_0_20px_rgba(51,255,51,0.2)] overflow-y-auto text-sm whitespace-pre-wrap break-words overflow-x-hidden rounded-md backdrop-blur-md"
+              className="flex-grow text-green-400 bg-black/70 border border-[#33ff33]/50 p-4 shadow-[0_0_20px_rgba(51,255,51,0.2)] overflow-y-auto text-sm whitespace-pre-wrap break-words overflow-x-hidden rounded-md backdrop-blur-md"
             ></div>
           </div>
 
@@ -434,7 +434,7 @@ System ready. Awaiting your commands...`
             <div
               ref={thoughtLogRef}
               id="thought-log"
-              className="flex-grow bg-black/70 border border-[#33ff33]/50 p-4 shadow-[0_0_20px_rgba(51,255,51,0.2)] overflow-y-auto text-sm whitespace-pre-wrap break-words overflow-x-hidden rounded-md backdrop-blur-md mb-4"
+              className="flex-grow text-green-500 bg-black/70 border border-[#33ff33]/50 p-4 shadow-[0_0_20px_rgba(51,255,51,0.2)] overflow-y-auto text-sm whitespace-pre-wrap break-words overflow-x-hidden rounded-md backdrop-blur-md mb-4"
             ></div>
 
             <div id="godmode-container" className="flex flex-col">
@@ -442,7 +442,7 @@ System ready. Awaiting your commands...`
                 ref={godmodeInputRef}
                 id="godmode-input"
                 placeholder="How should we proceed with our attack? (e.g. 'Check for open ports')"
-                className="bg-[#001f1f]/70 text-[#00ffff] border border-[#00ffff]/50 p-3 mb-3 resize-y w-full font-mono text-sm rounded-md transition-all duration-300 focus:shadow-[0_0_10px_rgba(0,255,255,0.5)] focus:outline-none backdrop-blur-md"
+                className="bg-[#001f1f]/70 text-amber-400 border border-[#00ffff]/50 p-3 mb-3 resize-y w-full font-mono text-sm rounded-md transition-all duration-300 focus:shadow-[0_0_10px_rgba(0,255,255,0.5)] focus:outline-none backdrop-blur-md"
                 rows={3}
                 onKeyDown={handleGodmodeKeyDown}
               />
