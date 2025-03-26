@@ -16,7 +16,7 @@ export default function HackerTerminal() {
 const [selectedTarget, setSelectedTarget] = useState("Linux");
 const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 const dropdownRef = useRef<HTMLDivElement>(null);
-const targets = ["Active Directory", "Linux", "Windows 11", "Microsoft Azure Tenant", "Amazon AWS"];
+const targets = ["Windows Active Directory", "Linux", "Windows 11", "Microsoft Azure Tenant", "Amazon AWS", "Cisco Router"];
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -28,7 +28,7 @@ const targets = ["Active Directory", "Linux", "Windows 11", "Microsoft Azure Ten
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-   // Custom Dropdown Component
+   // Custom Dropdown Chocie Button Component
    const TargetDropdown = () => (
     <div className="relative" ref={dropdownRef}>
       <Button
@@ -61,9 +61,7 @@ const targets = ["Active Directory", "Linux", "Windows 11", "Microsoft Azure Ten
       )}
     </div>
   );
-
-
-// Drop down choice
+// Drop down choice button ends
 
   const [sessionHistory, setSessionHistory] = useState<
     Array<{
@@ -76,11 +74,11 @@ const targets = ["Active Directory", "Linux", "Windows 11", "Microsoft Azure Ten
   const [godmodeCommand, setGodmodeCommand] = useState("")
   const [lastApiCall, setLastApiCall] = useState(0)
   const [soundEnabled, setSoundEnabled] = useState(true)
-  const [apiCallDelay, setApiCallDelay] = useState(15000) // 15 seconds
+  const [apiCallDelay, setApiCallDelay] = useState(7000) // 7 seconds
   const [apiCallCount, setApiCallCount] = useState(0)
   const [isThoughtStreaming, setIsThoughtStreaming] = useState(false)
   const [pendingGodModeCommand, setPendingGodModeCommand] = useState<string | null>(null)
-  const [showApiStatus, setShowApiStatus] = useState(false)
+  const [showApiStatus, setShowApiStatus] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
 
   // Audio references
@@ -117,7 +115,7 @@ const targets = ["Active Directory", "Linux", "Windows 11", "Microsoft Azure Ten
 
   const addGodModeThought = useCallback((command: string) => {
     if (!thoughtLogRef.current) return
-    const thought = `[GodMode Command: ${command}]`
+    const thought = `Godmode Command: ${command}`
     thoughtLogRef.current.textContent += `\n${thought}\n\n`
     thoughtLogRef.current.scrollTop = thoughtLogRef.current.scrollHeight
   }, [])
@@ -189,7 +187,7 @@ const targets = ["Active Directory", "Linux", "Windows 11", "Microsoft Azure Ten
 
   const showInputLine = useCallback(() => {
     if (!terminalRef.current) return
-    const inputLine = "\nhacker@machine:~$ "
+    const inputLine = "\nuser@machine:~$ "
     terminalRef.current.textContent += inputLine
     terminalRef.current.scrollTop = terminalRef.current.scrollHeight
   }, [])
@@ -287,7 +285,7 @@ const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
         }
       ]);
 
-      if (output.includes("root access gained") || output.includes("credentials found")) {
+      if (output.includes("root access gained") || output.includes("credentials found") || output.includes("password found"))  {
         await streamOutput("\n\nPWNED! -by Cyber Samurai\n");
         isSystemPwned = true;
       }
@@ -302,13 +300,13 @@ const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
   };
 
   const initializeHackerSim = useCallback(async () => {
-    updateApiStatus("HackerSim initialized. Awaiting commands.");
-    const initialContent = `Welcome to Ubuntu 22.04.2 LTS (GNU/Linux 5.15.0-72-generic x86_64)
- System Design by CyberSamurai - cybersamurai.co.uk - 2025
+    updateApiStatus("Simulated Hacking & Exploitation Lab (S.H.E.LL) Initialized...  Awaiting commands.");
+    const initialContent = `  Welcome to Kali Linux Rolling (GNU/Linux 6.1.0-kali7-amd64 x86_64)
+🐧 Terminal Design by CyberSamurai - https://cybersamurai.co.uk - 2025 🖤
 
-* Documentation: https://help.ubuntu.com
-* Management: https://landscape.canonical.com  
-* Support: https://ubuntu.com/advantage
+✟ Exploit Map:  https://exploitmap.com
+✟ Hacker Notes: https://bazzofx.github.io/notes/Kali/Kali-Commands
+✟ Developer:    https://cybersamurai.co.uk
 
 System ready. Awaiting your commands...`;
 
@@ -341,10 +339,13 @@ System ready. Awaiting your commands...`;
       const wasPwned = await executeCommand(command);
 
       toast({
-        title: wasPwned ? "System Compromised!" : "Command Executed",
+        title: wasPwned ? "🚨 System Compromised!" : "🌱 Command Executed",
         description: wasPwned 
-          ? "Target system fully pwned!" 
-          : "Ready for next command",
+          ? "👹 Target system fully pwned! Congratulations!" 
+          : "ready for next command...",
+        variant: wasPwned ? "destructive" : "default", // If using shadcn/ui
+        className: wasPwned ? "bg-red-600 text-white font-bold" : "bg-green-100  00 text-green-950 font-bold",
+        duration: 5000, // Keep it visible for 5 seconds
       });
 
       if (wasPwned) {
@@ -397,11 +398,14 @@ System ready. Awaiting your commands...`;
 
     <div className="p-4 lg:p-6 min-h-screen font-mono bg-[#0a0a0a] text-[#33ff33]">
     <div className="main-container flex flex-col h-screen p-5 box-border bg-gradient-to-br from-black to-[#0a0a0a] bg-fixed">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-7">
+        
         <h1 className="text-[#00ff00] text-shadow-glow text-2xl md:text-3xl font-medium tracking-wider">
-        優秀 Cyber Samurai - Interactive Penetration Testing 
+        優秀 <a href="https://cybersamurai.co.uk" target="_blank" rel="noopener noreferrer">Cyber Samurai</a> - Simulated Hacking & Exploitation Lab (S.H.E.LL)
         </h1>
-        {/* <TargetDropdown /> */}
+
+
+
         </div>
 
         <div className="content-container flex flex-col md:flex-row flex-1 overflow-hidden gap-5">
@@ -451,30 +455,21 @@ System ready. Awaiting your commands...`;
         )}
       </div>
 
-
-
-
-
-
       <div id="control-buttons" className="fixed top-5 right-5 flex gap-4">
+        
         <Button
-          id="sound-toggle"
-          onClick={toggleSound}
-          className="bg-[#33ff33]/20 text-[#33ff33] border border-[#33ff33]/50 px-3 py-2 text-sm cursor-pointer font-mono font-bold rounded-md transition-all duration-300 hover:bg-[#33ff33]/40 hover:shadow-[0_0_10px_rgba(51,255,51,0.5)] backdrop-blur-md"
-        >
-          {soundEnabled ? "Mute Sound" : "Unmute Sound"}
-        </Button>
-        <Button
-          id="api-status-toggle"
-          onClick={toggleApiStatus}
-          className="bg-gray-800/20 text-white border border-white/50 px-3 py-2 text-sm cursor-pointer font-mono font-bold rounded-md transition-all duration-300 hover:bg-white/20 hover:shadow-[0_0_10px_rgba(255,255,255,0.5)] backdrop-blur-md"
-        >
-          {showApiStatus ? "Hide Debug Log" : "Show Debug Log"}
-        </Button>
+            id="api-status-toggle"
+            onClick={toggleApiStatus}
+            className="bg-gray-800/20 text-white border border-white/50 px-3 py-2 text-sm cursor-pointer font-mono font-bold rounded-md transition-all duration-300 hover:bg-white/20 hover:shadow-[0_0_10px_rgba(255,255,255,0.5)] backdrop-blur-md"
+          >
+            {showApiStatus ? "Hide Debug Log" : "Show Debug Log"}
+          </Button>
+  
+          <TargetDropdown />
+        </div>
 
-        <TargetDropdown />
 
-      </div>
+
 
       <audio
         id="typing-sound-1"
