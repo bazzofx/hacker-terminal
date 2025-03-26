@@ -50,7 +50,7 @@ export default function HackerTerminal() {
         i++
         if (i >= thought.length) {
           clearInterval(intervalId)
-          thoughtLogRef.current.textContent += '\n\n'; // Add two new lines after each thought
+          thoughtLogRef.current.textContent += '\n\n'
           thoughtLogRef.current.scrollTop = thoughtLogRef.current.scrollHeight
           setIsThoughtStreaming(false)
           if (pendingGodModeCommand) {
@@ -60,13 +60,13 @@ export default function HackerTerminal() {
         }
       }, 20)
     },
-    [pendingGodModeCommand],
+    [pendingGodModeCommand]
   )
 
   const addGodModeThought = useCallback((command: string) => {
     if (!thoughtLogRef.current) return
     const thought = `[GodMode Command: ${command}]`
-    thoughtLogRef.current.textContent += `\n${thought}\n\n` // Added extra new line
+    thoughtLogRef.current.textContent += `\n${thought}\n\n`
     thoughtLogRef.current.scrollTop = thoughtLogRef.current.scrollHeight
   }, [])
 
@@ -89,7 +89,6 @@ export default function HackerTerminal() {
           terminalRef.current.textContent += command[i]
           terminalRef.current.scrollTop = terminalRef.current.scrollHeight
 
-          // Play typing sound
           if (soundEnabled) {
             const soundToPlay = i % 2 === 0 ? typingSound1Ref.current : typingSound2Ref.current
             soundToPlay?.play().catch((error) => {
@@ -105,7 +104,7 @@ export default function HackerTerminal() {
         }, 30)
       })
     },
-    [soundEnabled],
+    [soundEnabled]
   )
 
   const streamOutput = useCallback(async (output: string) => {
@@ -143,85 +142,6 @@ export default function HackerTerminal() {
     terminalRef.current.scrollTop = terminalRef.current.scrollHeight
   }, [])
 
-  const initializeHackerSim = useCallback(async () => {
-    updateApiStatus("HackerSim initialized. Hacker beginning autonomous session.")
-    const initialContent = `Welcome to Ubuntu 22.04.2 LTS (GNU/Linux 5.15.0-72-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/advantage
-
-  System information as of ${new Date().toUTCString()}
-
-  System load:  0.08               Processes:             109
-  Usage of /:   62.9% of 19.56GB   Users logged in:       1
-  Memory usage: 40%                IPv4 address for eth0: 192.168.1.100
-  Swap usage:   0%
-
- * Introducing Expanded Security Maintenance for Applications.
-   Receive updates to over 25,000 software packages with your
-   Ubuntu Pro subscription. Free for personal use.
-
-     https://ubuntu.com/pro
-
-Expanded Security Maintenance for Applications is not enabled.
-
-0 updates can be applied immediately.
-
-Last login: ${new Date(Date.now() - 3600000).toUTCString()} from 192.168.1.50`
-
-    if (terminalRef.current) {
-      terminalRef.current.innerHTML = initialContent
-      showInputLine()
-    }
-
-    setSessionHistory([
-      {
-        command: "",
-        output: initialContent,
-        thought: "Time to start exploring this system. What should I look for first?",
-        godmode_influence: "",
-      },
-    ])
-
-    try {
-      await addThought("Time to start exploring this system. What should I look for first?")
-      setTimeout(() => progressHackerSession(), 1000)
-    } catch (error) {
-      console.error("Error initializing HackerSim:", error)
-      updateApiStatus(`Error initializing HackerSim: ${error instanceof Error ? error.message : "Unknown error"}`)
-      setTimeout(() => progressHackerSession(), 1000)
-    }
-  }, [addThought, showInputLine])
-
-  useEffect(() => {
-    // Initialize audio elements
-    typingSound1Ref.current = new Audio(
-      "https://cdn.pixabay.com/download/audio/2022/03/24/audio_ef3fa634de.mp3?filename=keyboard-spacebar-hit-101812.mp3",
-    )
-    typingSound2Ref.current = new Audio(
-      "https://cdn.pixabay.com/download/audio/2022/03/15/audio_bca2811b06.mp3?filename=keyboard5-88069.mp3",
-    )
-
-    // Initialize terminal
-    if (!isInitialized) {
-      initializeHackerSim()
-      setIsInitialized(true)
-    }
-
-    return () => {
-      // Cleanup audio elements
-      if (typingSound1Ref.current) {
-        typingSound1Ref.current.pause()
-        typingSound1Ref.current = null
-      }
-      if (typingSound2Ref.current) {
-        typingSound2Ref.current.pause()
-        typingSound2Ref.current = null
-      }
-    }
-  }, [isInitialized, initializeHackerSim])
-
   const updateApiStatus = (message: string) => {
     if (!apiStatusRef.current) return
 
@@ -236,205 +156,197 @@ Last login: ${new Date(Date.now() - 3600000).toUTCString()} from 192.168.1.50`
     const timeToWait = Math.max(0, apiCallDelay - (now - lastApiCall))
 
     if (timeToWait > 0) {
-      updateApiStatus(`Waiting ${timeToWait / 1000} seconds before next hacker action`)
+      updateApiStatus(`Waiting ${timeToWait / 1000} seconds before next action`)
       await new Promise((resolve) => setTimeout(resolve, timeToWait))
     }
 
     const maxApiCallsPerFiveMinutes = 18
     if (apiCallCount >= maxApiCallsPerFiveMinutes) {
       const waitTime = 60000 // 1 minute
-      updateApiStatus(`Rate limit reached. Hacker taking a short break.`)
-      await addThought("Hmm, I've been going pretty fast. Maybe I should take a quick break to avoid detection.")
+      updateApiStatus(`Rate limit reached. Taking a short break.`)
+      await addThought("Hmm, I've been going pretty fast. Maybe I should take a quick break...")
       await new Promise((resolve) => setTimeout(resolve, waitTime))
       setApiCallCount(0)
-      await addThought("Alright, break's over. Let's get back to work.")
+      await addThought("Alright, break's over. Ready for next command.")
     }
 
     setLastApiCall(Date.now())
     setApiCallCount((prev) => prev + 1)
 
-    // Reset API call count after 5 minutes
     setTimeout(() => {
       setApiCallCount(0)
     }, 300000)
   }
 
-// 
-const progressHackerSession = async (retryCount = 0) => {
-  const MAX_ITERATIONS = 50;
-  let iterationCount = 0;
-  let isSystemPwned = false;
 
-  // [1] FIRST API CALL: Simulate command output
-  const executeHackerCommand = async (command: string, context: string) => {
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer sk-100f6cbc87464ad490409ae9aa67bf40`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          {
-            role: "system",
-            content: `Simulate realistic Linux command output for: ${command}. Our objective is to pivot our attack into the network and find other vulnerable servers.`
-          },
-          {
-            role: "user",
-            content: context
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 1000
-      })
-    });
-    return (await response.json()).choices[0].message.content;
-  };
+  const apiDeepSeek = process.env.apiDeepSeek
+  const apiDeepSeek2 = process.env.apiGoogle
+  console.log(apiDeepSeek)
+ console.log(apiDeepSeek2)
 
-  // [2] SECOND API CALL: Determine next command
-  const getNextHackerCommand = async (lastOutput: string) => {
-    try {
+  const executeCommand = async (command: string) => {
+    let isSystemPwned = false;
+
+    const simulateCommandOutput = async (cmd: string, context: string) => {
+      await waitForNextCallWindow();
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer sk-100f6cbc87464ad490409ae9aa67bf40`,
+          'Authorization': `Bearer ${apiDeepSeek}`,
         },
+
         body: JSON.stringify({
           model: "deepseek-chat",
           messages: [
             {
               role: "system",
-              content: `Provide next penetration testing command as JSON. Example:
-              {"command":"nmap -sV 192.168.1.1","thought":"Scanning for open ports"}`
+              content: `Simulate realistic Linux command output for penetration testing. Command: ${cmd}`
             },
             {
               role: "user",
-              content: `Last output: ${lastOutput}\n\nSuggested next command so we can continue pivoting our attack based on the cyber kill chain penetration testing the server and network, the output must`
+              content: context
             }
           ],
-          response_format: { type: "json_object" },
-          temperature: 0.7,
+          temperature: 0.3,
           max_tokens: 500
         })
       });
-  
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-  
-      const data = await response.json();
-      
-      // Validate response structure
-      if (!data?.choices?.[0]?.message?.content) {
-        throw new Error("Invalid API response structure");
-      }
-  
-      const parsed = JSON.parse(data.choices[0].message.content);
-      
-      // Validate command format
-      if (!parsed.command || !parsed.thought) {
-        throw new Error("Missing command or thought in response");
-      }
-  
-      return parsed;
-  
-    } catch (error) {
-      console.error("API Error:", error);
-      // Fallback commands if API fails
-      const fallbacks = [
-        {command: "nmap -sV -p- localhost", thought: "Performing network scan"},
-        {command: "curl -I http://localhost", thought: "Checking web server"},
-        {command: "sudo netstat -tulpn", thought: "Checking listening ports"}
-      ];
-      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
-    }
-  };
+      return (await response.json()).choices[0].message.content;
+    };
 
-  try {
-    while (iterationCount < MAX_ITERATIONS && !isSystemPwned) {
-      // [3] MAIN EXECUTION LOOP
-      const { command, thought } = await getNextHackerCommand(
-        sessionHistory.slice(-1)[0]?.output || "Initial scan"
-      );
-      
-      const output = await executeHackerCommand(command, 
-        `Previous commands:\n${JSON.stringify(sessionHistory.slice(-3))}`
+    try {
+      const thought = `Executing: ${command}`;
+      const output = await simulateCommandOutput(
+        command,
+        `Session history:\n${JSON.stringify(sessionHistory.slice(-3), null, 2)}`
       );
 
-      // Update UI and state
       await addThought(thought);
       await simulateTyping(command);
       await streamOutput(output);
       
-      setSessionHistory(prev => [...prev, { command, output, thought }]);
-      
-      // Check for compromise
-      if (output.includes("root access") || 
-          output.includes("credentials found")) {
+      setSessionHistory(prev => [
+        ...prev,
+        {
+          command,
+          output,
+          thought,
+          godmode_influence: command
+        }
+      ]);
+
+      if (output.includes("root access") || output.includes("credentials found")) {
         await streamOutput("\n\nPWNED! -by Cyber Samurai\n");
         isSystemPwned = true;
       }
 
-      await new Promise(resolve => setTimeout(resolve, 3000));
-    }
-  } catch (error) {
-    console.error("Session Error:", error);
-    if (retryCount < 3) {
-      setTimeout(() => progressHackerSession(retryCount + 1), 5000);
-    } else {
-      await streamOutput("\n\n[!] Critical failure. Rebooting session...");
-      setTimeout(initializeHackerSim, 10000);
-    }
-  }
-};
-// 
+      return isSystemPwned;
 
-  const submitGodmodeCommand = () => {
-    if (!godmodeInputRef.current) return
+    } catch (error) {
+      console.error("Command error:", error);
+      await streamOutput(`\n\n[!] Command failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+      return false;
+    }
+  };
 
-    const command = godmodeInputRef.current.value.trim()
+  const initializeHackerSim = useCallback(async () => {
+    updateApiStatus("HackerSim initialized. Awaiting commands.");
+    const initialContent = `Welcome to Ubuntu 22.04.2 LTS (GNU/Linux 5.15.0-72-generic x86_64)
+ System Design by CyberSamurai - cybersamurai.co.uk - 2025
+
+* Documentation: https://help.ubuntu.com
+* Management: https://landscape.canonical.com  
+* Support: https://ubuntu.com/advantage
+
+System ready. Awaiting your commands...`;
+
+    if (terminalRef.current) {
+      terminalRef.current.innerHTML = initialContent;
+      showInputLine();
+    }
+
+    setSessionHistory([{
+      command: "",
+      output: initialContent,
+      thought: "System initialized. Ready for commands.",
+      godmode_influence: ""
+    }]);
+
+    await addThought("System initialized. Ready for commands.");
+  }, [addThought, showInputLine]);
+
+  const submitGodmodeCommand = async () => {
+    if (!godmodeInputRef.current) return;
+
+    const command = godmodeInputRef.current.value.trim();
     if (command) {
-      setGodmodeCommand(command)
-      if (!isThoughtStreaming) {
-        addGodModeThought(command)
-      } else {
-        setPendingGodModeCommand(command)
-      }
-      godmodeInputRef.current.value = ""
-      updateApiStatus("GodMode command received. Influencing hacker's next action.")
+      setGodmodeCommand(command);
+      godmodeInputRef.current.value = "";
+      
+      updateApiStatus(`Executing: ${command}`);
+      addGodModeThought(command);
+
+      const wasPwned = await executeCommand(command);
 
       toast({
-        title: "GodMode Command Received",
-        description: "Your command will influence the hacker's next action.",
-      })
+        title: wasPwned ? "System Compromised!" : "Command Executed",
+        description: wasPwned 
+          ? "Target system fully pwned!" 
+          : "Ready for next command",
+      });
 
-      // Immediately trigger the next hacker action to respond to the GodMode command
-      setTimeout(() => progressHackerSession(), 1000)
+      if (wasPwned) {
+        godmodeInputRef.current.disabled = true;
+      }
     }
-  }
+  };
 
   const handleGodmodeKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      submitGodmodeCommand()
+      e.preventDefault();
+      submitGodmodeCommand();
     }
-  }
+  };
 
   const toggleSound = () => {
-    setSoundEnabled((prev) => !prev)
-  }
+    setSoundEnabled((prev) => !prev);
+  };
 
   const toggleApiStatus = () => {
-    setShowApiStatus((prev) => !prev)
-  }
+    setShowApiStatus((prev) => !prev);
+  };
+
+  useEffect(() => {
+    typingSound1Ref.current = new Audio(
+      "https://cdn.pixabay.com/download/audio/2022/03/24/audio_ef3fa634de.mp3?filename=keyboard-spacebar-hit-101812.mp3",
+    );
+    typingSound2Ref.current = new Audio(
+      "https://cdn.pixabay.com/download/audio/2022/03/15/audio_bca2811b06.mp3?filename=keyboard5-88069.mp3",
+    );
+
+    if (!isInitialized) {
+      initializeHackerSim();
+      setIsInitialized(true);
+    }
+
+    return () => {
+      if (typingSound1Ref.current) {
+        typingSound1Ref.current.pause();
+        typingSound1Ref.current = null;
+      }
+      if (typingSound2Ref.current) {
+        typingSound2Ref.current.pause();
+        typingSound2Ref.current = null;
+      }
+    };
+  }, [isInitialized, initializeHackerSim]);
 
   return (
     <div className="p-4 lg:p-6 min-h-screen font-mono bg-[#0a0a0a] text-[#33ff33]">
       <div className="main-container flex flex-col h-screen p-5 box-border bg-gradient-to-br from-black to-[#0a0a0a] bg-fixed">
         <h1 className="text-[#00ff00] text-shadow-glow text-2xl md:text-3xl font-medium tracking-wider mb-4">
-          HackerSim - Autonomous Hacker Terminal
+          HackerSim - Interactive Penetration Testing
         </h1>
 
         <div className="content-container flex flex-col md:flex-row flex-1 overflow-hidden gap-5">
@@ -458,7 +370,7 @@ const progressHackerSession = async (retryCount = 0) => {
               <Textarea
                 ref={godmodeInputRef}
                 id="godmode-input"
-                placeholder="Enter a GodMode command to direct the hacker's next action..."
+                placeholder="Enter penetration testing command (e.g. 'nmap -sV 192.168.1.1')"
                 className="bg-[#001f1f]/70 text-[#00ffff] border border-[#00ffff]/50 p-3 mb-3 resize-y w-full font-mono text-sm rounded-md transition-all duration-300 focus:shadow-[0_0_10px_rgba(0,255,255,0.5)] focus:outline-none backdrop-blur-md"
                 rows={3}
                 onKeyDown={handleGodmodeKeyDown}
@@ -468,7 +380,7 @@ const progressHackerSession = async (retryCount = 0) => {
                 onClick={submitGodmodeCommand}
                 className="bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/50 p-2 cursor-pointer font-mono font-bold rounded-md transition-all duration-300 hover:bg-[#00ffff]/40 hover:shadow-[0_0_10px_rgba(0,255,255,0.5)] backdrop-blur-md"
               >
-                Submit GodMode Command
+                Execute Command
               </Button>
             </div>
           </div>
@@ -500,7 +412,6 @@ const progressHackerSession = async (retryCount = 0) => {
         </Button>
       </div>
 
-      {/* Audio elements for typing sounds */}
       <audio
         id="typing-sound-1"
         src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_ef3fa634de.mp3?filename=keyboard-spacebar-hit-101812.mp3"
