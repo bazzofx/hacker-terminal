@@ -156,11 +156,11 @@ export default function HackerTerminal() {
     const timeToWait = Math.max(0, apiCallDelay - (now - lastApiCall))
 
     if (timeToWait > 0) {
-      updateApiStatus(`Waiting ${timeToWait / 1000} seconds before next action`)
+      updateApiStatus(`Waiting ${timeToWait / 500} seconds before next action`)
       await new Promise((resolve) => setTimeout(resolve, timeToWait))
     }
 
-    const maxApiCallsPerFiveMinutes = 18
+    const maxApiCallsPerFiveMinutes = 20
     if (apiCallCount >= maxApiCallsPerFiveMinutes) {
       const waitTime = 60000 // 1 minute
       updateApiStatus(`Rate limit reached. Taking a short break.`)
@@ -179,10 +179,9 @@ export default function HackerTerminal() {
   }
 
 
-  const apiDeepSeek = process.env.apiDeepSeek
-  const apiDeepSeek2 = process.env.apiGoogle
-  console.log(apiDeepSeek)
- console.log(apiDeepSeek2)
+
+
+const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
 
   const executeCommand = async (command: string) => {
     let isSystemPwned = false;
@@ -201,7 +200,7 @@ export default function HackerTerminal() {
           messages: [
             {
               role: "system",
-              content: `Simulate realistic Linux command output for penetration testing. Command: ${cmd}`
+              content: `Simulate realistic Windows Active Directory command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited, after a little bit of struggle. Command: ${cmd}`
             },
             {
               role: "user",
@@ -236,7 +235,7 @@ export default function HackerTerminal() {
         }
       ]);
 
-      if (output.includes("root access") || output.includes("credentials found")) {
+      if (output.includes("root access gained") || output.includes("credentials found")) {
         await streamOutput("\n\nPWNED! -by Cyber Samurai\n");
         isSystemPwned = true;
       }
@@ -346,7 +345,7 @@ System ready. Awaiting your commands...`;
     <div className="p-4 lg:p-6 min-h-screen font-mono bg-[#0a0a0a] text-[#33ff33]">
       <div className="main-container flex flex-col h-screen p-5 box-border bg-gradient-to-br from-black to-[#0a0a0a] bg-fixed">
         <h1 className="text-[#00ff00] text-shadow-glow text-2xl md:text-3xl font-medium tracking-wider mb-4">
-          HackerSim - Interactive Penetration Testing
+        優秀 Cyber Samurai - Interactive Penetration Testing 
         </h1>
 
         <div className="content-container flex flex-col md:flex-row flex-1 overflow-hidden gap-5">
@@ -370,7 +369,7 @@ System ready. Awaiting your commands...`;
               <Textarea
                 ref={godmodeInputRef}
                 id="godmode-input"
-                placeholder="Enter penetration testing command (e.g. 'nmap -sV 192.168.1.1')"
+                placeholder="How should we proceed with our attack? (e.g. 'Check for open ports')"
                 className="bg-[#001f1f]/70 text-[#00ffff] border border-[#00ffff]/50 p-3 mb-3 resize-y w-full font-mono text-sm rounded-md transition-all duration-300 focus:shadow-[0_0_10px_rgba(0,255,255,0.5)] focus:outline-none backdrop-blur-md"
                 rows={3}
                 onKeyDown={handleGodmodeKeyDown}
