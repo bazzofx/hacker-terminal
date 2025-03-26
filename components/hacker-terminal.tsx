@@ -12,6 +12,58 @@ export default function HackerTerminal() {
   const thoughtLogRef = useRef<HTMLDivElement>(null)
   const godmodeInputRef = useRef<HTMLTextAreaElement>(null)
   const apiStatusRef = useRef<HTMLDivElement>(null)
+// custom drop down buttons
+const [selectedTarget, setSelectedTarget] = useState("Linux");
+const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+const dropdownRef = useRef<HTMLDivElement>(null);
+const targets = ["Active Directory", "Linux", "Windows 11", "Microsoft Azure Tenant", "Amazon AWS"];
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+   // Custom Dropdown Component
+   const TargetDropdown = () => (
+    <div className="relative" ref={dropdownRef}>
+      <Button
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="bg-[#33ff33]/10 text-[#33ff33] border border-[#33ff33]/50 font-mono text-sm hover:bg-[#33ff33]/20"
+      >
+        Target: {selectedTarget} ▼
+      </Button>
+      
+      {isDropdownOpen && (
+        <div className="absolute z-10 mt-1 w-full bg-[#0a0a0a] border border-[#33ff33]/50 rounded-md shadow-lg">
+          {targets.map((target) => (
+            <button
+              key={target}
+              className={`block w-full text-left px-4 py-2 text-sm font-mono ${
+                selectedTarget === target
+                  ? "bg-[#33ff33]/20 text-[#33ff33]"
+                  : "text-[#33ff33]/80 hover:bg-[#33ff33]/10"
+              }`}
+              onClick={() => {
+                setSelectedTarget(target);
+                setIsDropdownOpen(false);
+                updateApiStatus(`Target changed to: ${target}`);
+              }}
+            >
+              {target}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+
+// Drop down choice
 
   const [sessionHistory, setSessionHistory] = useState<
     Array<{
@@ -200,7 +252,7 @@ const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
           messages: [
             {
               role: "system",
-              content: `Simulate realistic Windows Active Directory command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited, after a little bit of struggle. Command: ${cmd}`
+              content: `Simulate realistic ${selectedTarget} command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited, after a little bit of struggle. Command: ${cmd}`
             },
             {
               role: "user",
@@ -342,11 +394,15 @@ System ready. Awaiting your commands...`;
   }, [isInitialized, initializeHackerSim]);
 
   return (
+
     <div className="p-4 lg:p-6 min-h-screen font-mono bg-[#0a0a0a] text-[#33ff33]">
-      <div className="main-container flex flex-col h-screen p-5 box-border bg-gradient-to-br from-black to-[#0a0a0a] bg-fixed">
-        <h1 className="text-[#00ff00] text-shadow-glow text-2xl md:text-3xl font-medium tracking-wider mb-4">
+    <div className="main-container flex flex-col h-screen p-5 box-border bg-gradient-to-br from-black to-[#0a0a0a] bg-fixed">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-[#00ff00] text-shadow-glow text-2xl md:text-3xl font-medium tracking-wider">
         優秀 Cyber Samurai - Interactive Penetration Testing 
         </h1>
+        {/* <TargetDropdown /> */}
+        </div>
 
         <div className="content-container flex flex-col md:flex-row flex-1 overflow-hidden gap-5">
           <div id="terminal-container" className="flex-1 md:flex-[2] flex flex-col min-w-0">
@@ -389,10 +445,16 @@ System ready. Awaiting your commands...`;
           <div
             ref={apiStatusRef}
             id="api-status"
-            className="bg-black/70 text-[#00ffff] p-3 text-xs h-[100px] overflow-y-auto mt-4 rounded-md border border-[#00ffff]/50 backdrop-blur-md"
-          ></div>
+            className="bg-black/70 text-[#00ffff] p-3 text-xs h-[100px] overflow-y-auto mt-4 rounded-md border border-[#00ffff]/50 backdrop-blur-md">
+            <div className="font-bold mb-1">DEBUG LOG:</div>
+          </div>
         )}
       </div>
+
+
+
+
+
 
       <div id="control-buttons" className="fixed top-5 right-5 flex gap-4">
         <Button
@@ -409,6 +471,9 @@ System ready. Awaiting your commands...`;
         >
           {showApiStatus ? "Hide Debug Log" : "Show Debug Log"}
         </Button>
+
+        <TargetDropdown />
+
       </div>
 
       <audio
