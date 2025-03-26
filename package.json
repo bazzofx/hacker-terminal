@@ -1,6 +1,7 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "@bazzofx/hacker-terminal",
+  "version": "0.0.1",
+  "description":"Emulate how it would be to hack a computer, learn new techniques with help of AI + LLM",
   "private": true,
   "scripts": {
     "dev": "next dev",
