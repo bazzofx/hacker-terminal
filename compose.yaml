@@ -1,0 +1,30 @@
+# Use an official Node.js runtime as a parent image
+FROM node:18-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json to install dependencies
+COPY package.json package-lock.json ./
+
+# Install dependencies (only production dependencies)
+RUN npm install --omit=dev
+
+# Copy the rest of the application files
+COPY . .
+
+#Update and Upgrade OS
+RUN sudo apt update -y && sudo apt upgrade -y
+
+# Build the Next.js app
+RUN npm run build
+
+# Expose the port Next.js runs on
+EXPOSE 3000
+
+# Set the environment variable
+ARG NEXT_PUBLIC_APIDEEPSEEK
+ENV NEXT_PUBLIC_APIDEEPSEEK=$NEXT_PUBLIC_APIDEEPSEEK
+
+# Start the Next.js production server
+CMD ["npm", "run", "production"]
