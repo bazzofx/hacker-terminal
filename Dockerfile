@@ -8,14 +8,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && apt upgrade -y  2>/dev/null
 #Install Git
 RUN apt install git -y
-#Install NPM Package (on the OS)
-RUN apt install npm -y
-#Install Nginx Server 
+#Install Nginx Server
 RUN apt install nginx -y
 #Install certbot
 RUN apt install certbot -y && apt install python3-certbot-nginx -y
-#Install NextJS
-RUN npm install next -y
+#Install NextJS + Latest Node Versions
+RUN apt install curl -y
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
+RUN apt-get install nodejs -y
+RUN node -v && npm -v
+#RUN npm install next
+#RUN npm install nextjs
 
 
 
