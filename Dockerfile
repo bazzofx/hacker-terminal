@@ -40,7 +40,7 @@ RUN echo 'server {\n\
 }' > /etc/nginx/sites-available/hackerterminal
 
 # Ensure Nginx is enabled
-RUN systemctl enable nginx
+RUN service nginx start || true
 
 # Define startup script to start both Nginx and the app
 CMD service nginx start && npm run production
