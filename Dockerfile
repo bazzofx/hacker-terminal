@@ -5,17 +5,17 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
-RUN apt update -y && apt upgrade -y 
+RUN apt update -y && apt upgrade -y  2>/dev/null
 #Install Git
-RUN apt install git -y
+RUN apt install git -y  2>/dev/null
 #Install NPM Package (on the OS)
-RUN apt install npm -y
+RUN apt install npm -y  2>/dev/null
 #Install Nginx Server 
-RUN apt install nginx -y
+RUN apt install nginx -y  2>/dev/null
 #Install certbot
-RUN apt install certbot -y && apt install python3-certbot-nginx -y
+RUN apt install certbot -y && apt install python3-certbot-nginx -y  2>/dev/null
 #Install NextJS
-RUN npm install nextjs -y
+RUN npm install nextjs -y  2>/dev/null
 
 
 
