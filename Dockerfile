@@ -19,6 +19,7 @@ RUN npm install
 
 # Set environment variable for API key
 ARG API_KEY
+ARG SERVERNAME
 RUN echo NEXT_PUBLIC_APIDEEPSEEK="$API_KEY" > .env.local
 
 # Expose necessary ports
@@ -27,7 +28,7 @@ EXPOSE 80 443 3000
 # Copy and configure Nginx reverse proxy
 RUN echo "server {\n\
     listen 80;\n\
-    server_name hackerterminal.exploitmap.com;\n\
+    server_name $SERVERNAME;\n\
     location / {\n\
         proxy_pass http://localhost:3000;\n\
         proxy_set_header Host \$host;\n\
