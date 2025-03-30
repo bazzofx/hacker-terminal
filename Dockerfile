@@ -6,15 +6,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
 RUN apt update -y && apt upgrade -y 
-
-#Install NPM Package
+#Install Git
+RUN apt install git -y
+#Install NPM Package (on the OS)
 RUN apt install npm -y
-#Install Nginx Server
+#Install Nginx Server 
 RUN apt install nginx -y
 #Install certbot
 RUN apt install certbot -y && apt install python3-certbot-nginx -y
 #Install NextJS
 RUN npm install nextjs
+
 
 
 # Clone the repository
