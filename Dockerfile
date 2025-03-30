@@ -5,7 +5,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
-RUN apt update -y && apt upgrade -y && 
+RUN apt update -y && apt upgrade -y 
 
 #Install NPM Package
 RUN apt install npm -y
@@ -15,8 +15,6 @@ RUN apt install nginx -y
 RUN apt install certbot -y && apt install python3-certbot-nginx -y
 #Install NextJS
 RUN npm install nextjs
-
-
 
 
 # Clone the repository
