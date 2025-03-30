@@ -20,23 +20,24 @@ RUN npm install
 # Set environment variable for API key
 ARG API_KEY
 ARG SERVERNAME
+ENV SERVERNAME=${SERVERNAME}
 RUN echo NEXT_PUBLIC_APIDEEPSEEK="$API_KEY" > .env.local
 
 # Expose necessary ports
 EXPOSE 80 443 3000
 
 # Copy and configure Nginx reverse proxy
-RUN echo "server {\n\
+RUN echo 'server {\n\
     listen 80;\n\
-    server_name $SERVERNAME;\n\
+    server_name ${SERVERNAME};\n\
     location / {\n\
         proxy_pass http://localhost:3000;\n\
-        proxy_set_header Host \$host;\n\
-        proxy_set_header X-Real-IP \$remote_addr;\n\
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n\
-        proxy_set_header X-Forwarded-Proto \$scheme;\n\
+        proxy_set_header Host $host;\n\
+        proxy_set_header X-Real-IP $remote_addr;\n\
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
+        proxy_set_header X-Forwarded-Proto $scheme;\n\
     }\n\
-}" > /etc/nginx/sites-available/default
+}' > /etc/nginx/sites-available/hackerterminal
 
 # Ensure Nginx is enabled
 RUN systemctl enable nginx
