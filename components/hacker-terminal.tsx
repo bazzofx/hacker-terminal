@@ -273,7 +273,7 @@ export default function HackerTerminal() {
           max_tokens: 300
         })
       })
-
+//  ------------------debugging Api Call
       const responseData = await response.json()
       const fullResponse = responseData.choices[0].message.content
       
