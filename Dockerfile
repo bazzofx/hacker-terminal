@@ -17,9 +17,6 @@ RUN apt install curl -y
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install nodejs -y
 RUN node -v && npm -v
-#RUN npm install next
-#RUN npm install nextjs
-
 
 
 # Clone the repository
