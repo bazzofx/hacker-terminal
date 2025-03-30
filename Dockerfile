@@ -15,7 +15,7 @@ RUN apt install nginx -y
 #Install certbot
 RUN apt install certbot -y && apt install python3-certbot-nginx -y
 #Install NextJS
-RUN npm install nextjs -y
+RUN npm install next -y
 
 
 
@@ -26,13 +26,15 @@ RUN git clone https://github.com/bazzofx/hacker-terminal.git /app
 WORKDIR /app
 
 # Install npm dependencies
-RUN npm install
+RUN npm install  2>/dev/null
 
 # Set environment variable for API key
 ARG API_KEY
 ARG SERVERNAME
 ENV SERVERNAME=${SERVERNAME}
-RUN echo NEXT_PUBLIC_APIDEEPSEEK="$API_KEY" > .env.local
+ENV NEXT_PUBLIC_APIDEEPSEEK=${API_KEY}
+# Create .env.local file with API_KEY
+RUN echo "NEXT_PUBLIC_APIDEEPSEEK=${API_KEY}" > .env.local
 
 # Expose necessary ports
 EXPOSE 80 443 3000
