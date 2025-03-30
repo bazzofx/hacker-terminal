@@ -7,15 +7,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
 RUN apt update -y && apt upgrade -y  2>/dev/null
 #Install Git
-RUN apt install git -y  2>/dev/null
+RUN apt install git -y
 #Install NPM Package (on the OS)
-RUN apt install npm -y  2>/dev/null
+RUN apt install npm -y
 #Install Nginx Server 
-RUN apt install nginx -y  2>/dev/null
+RUN apt install nginx -y
 #Install certbot
-RUN apt install certbot -y && apt install python3-certbot-nginx -y  2>/dev/null
+RUN apt install certbot -y && apt install python3-certbot-nginx -y
 #Install NextJS
-RUN npm install nextjs -y  2>/dev/null
+RUN npm install nextjs -y
 
 
 
@@ -26,7 +26,7 @@ RUN git clone https://github.com/bazzofx/hacker-terminal.git /app
 WORKDIR /app
 
 # Install npm dependencies
-RUN npm install 2>/dev/null
+RUN npm install
 
 # Set environment variable for API key
 ARG API_KEY
