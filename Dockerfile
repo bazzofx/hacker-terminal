@@ -1,12 +1,12 @@
-# Use a base image with Ubuntu
+# Use Ubuntu as base image
 FROM ubuntu:20.04
 
-# Set environment variables to avoid some interactive prompts during package installation
+# Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update and install necessary dependencies
+# Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
 RUN apt update -y && apt upgrade -y && \
-    apt install -y git curl npm
+    apt install -y git curl npm nginx certbot python3-certbot-nginx
 
 # Clone the repository
 RUN git clone https://github.com/bazzofx/hacker-terminal.git /app
@@ -21,10 +21,24 @@ RUN npm install
 ARG API_KEY
 RUN echo NEXT_PUBLIC_APIDEEPSEEK="$API_KEY" > .env.local
 
+# Expose necessary ports
+EXPOSE 80 443 3000
 
-# Expose any necessary ports
-EXPOSE 3000
+# Copy and configure Nginx reverse proxy
+RUN echo "server {\n\
+    listen 80;\n\
+    server_name hackerterminal.exploitmap.com;\n\
+    location / {\n\
+        proxy_pass http://localhost:3000;\n\
+        proxy_set_header Host \$host;\n\
+        proxy_set_header X-Real-IP \$remote_addr;\n\
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n\
+        proxy_set_header X-Forwarded-Proto \$scheme;\n\
+    }\n\
+}" > /etc/nginx/sites-available/default
 
+# Ensure Nginx is enabled
+RUN systemctl enable nginx
 
-# Build the application in production mode
-CMD ["npm", "run", "production"]
+# Define startup script to start both Nginx and the app
+CMD service nginx start && npm run production
