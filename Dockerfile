@@ -5,8 +5,19 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
-RUN apt update -y && apt upgrade -y && \
-    apt install -y git curl npm nginx certbot python3-certbot-nginx
+RUN apt update -y && apt upgrade -y && 
+
+#Install NPM Package
+RUN apt install npm -y
+#Install Nginx Server
+RUN apt install nginx -y
+#Install certbot
+RUN apt install certbot -y && apt install python3-certbot-nginx -y
+#Install NextJS
+RUN npm install nextjs
+
+
+
 
 # Clone the repository
 RUN git clone https://github.com/bazzofx/hacker-terminal.git /app
