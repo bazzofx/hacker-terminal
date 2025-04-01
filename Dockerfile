@@ -43,14 +43,14 @@ EXPOSE 80 443 3000
 # Configure Nginx as a reverse proxy
 RUN echo 'server {\n\
     listen 80;\n\
-    server_name '"$NAME"';\n\
+    server_name ${NAME};\n\
     return 301 https://$host$request_uri;\n\
 }\n\
 server {\n\
     listen 443 ssl;\n\
-    server_name '"$NAME"';\n\
-    ssl_certificate /etc/letsencrypt/live/$NAME/fullchain.pem;\n\
-    ssl_certificate_key /etc/letsencrypt/live/$NAME/privkey.pem;\n\
+    server_name ${NAME};\n\
+    ssl_certificate /etc/letsencrypt/live/${NAME}fullchain.pem;\n\
+    ssl_certificate_key /etc/letsencrypt/live/${NAME}privkey.pem;\n\
     location / {\n\
         proxy_pass http://localhost:3000;\n\
         proxy_set_header Host $host;\n\
