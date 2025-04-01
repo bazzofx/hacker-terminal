@@ -31,7 +31,7 @@ RUN npm install  2>/dev/null
 # Set environment variable for API key
 ARG API_KEY
 ARG SERVERNAME
-ENV SERVERNAME=${SERVERNAME}
+ENV SERVERNAME=${NAME}
 ENV NEXT_PUBLIC_APIDEEPSEEK=${API_KEY}
 # Create .env.local file with API_KEY
 RUN echo "NEXT_PUBLIC_APIDEEPSEEK=${API_KEY}" > .env.local
@@ -42,7 +42,7 @@ EXPOSE 80 443 3000
 # Copy and configure Nginx reverse proxy
 RUN echo 'server {\n\
     listen 80;\n\
-    server_name ${SERVERNAME};\n\
+    server_name ${NAME};\n\
     location / {\n\
         proxy_pass http://localhost:3000;\n\
         proxy_set_header Host $host;\n\
@@ -52,8 +52,13 @@ RUN echo 'server {\n\
     }\n\
 }' > /etc/nginx/sites-available/hackerterminal
 
-# Ensure Nginx is enabled
-RUN service nginx start || true
+# Copy startup script
+COPY dockerScript/dockerEntrypoint.sh dockerEntrypoint.sh
+RUN chmod +x dockerEntrypoint.sh
+
+
+# Start Nginx Server and run Certbot Script to give server a SSL certificate
+CMD ["dockerEntrypoint.sh"]
 
 # Define startup script to start both Nginx and the app
 CMD service nginx start && npm run production

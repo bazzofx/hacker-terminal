@@ -1,7 +1,7 @@
 #!/bin/bash
 # Set environment variables
-export ApiDeepSeek="YOUR_REAL_DEEP_SEEK_API"
-export domainName="microsoft.org"
+ApiDeepSeek="YOUR_REAL_DEEP_SEEK_API"
+domainName="microsoft.org"
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null
