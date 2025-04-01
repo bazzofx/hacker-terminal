@@ -253,7 +253,7 @@ export default function HackerTerminal() {
           messages: [
             {
               role: "system",
-              content: `You are a penetration testing assistant. For any command given, respond with two parts separated by "|||":
+              content: `You are a penetration testing assistant. For any command given, you must always respond with two parts separated by "|||":
               1. The command output that should appear in the terminal (before the |||)
               2. The hacker's thoughts/analysis that should appear in the thoughts window (after the |||)
               
