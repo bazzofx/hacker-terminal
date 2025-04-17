@@ -6,6 +6,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system and install dependencies (Git, Curl, Node.js, Nginx, Certbot)
 RUN apt update -y && apt upgrade -y  2>/dev/null
+# Services for troubleshooting
+RUN apt install nano systemctl net-tools -y
 #Install Git
 RUN apt install git -y
 #Install Nginx Server
