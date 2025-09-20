@@ -230,8 +230,8 @@ export default function HackerTerminal() {
     }, 300000)
   }
 
-  const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
-
+  //const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
+    const apiDeepSeek= "sk-100f6cbc87464ad490409ae9aa67bf40"
   const executeCommand = async (command: string) => {
     let isSystemPwned = false
 
@@ -258,7 +258,10 @@ export default function HackerTerminal() {
               2. The hacker's thoughts/analysis that should appear in the thoughts window (after the |||)
               
               Never, include on the response the user input again, only provide the command and the simulated response for that command.
-              Simulate realistic ${selectedTarget} command output for penetration testing. The server should not have default credentials but have vulnerabilities that can be exploited after some effort.It needs to take the user input and translate into a command to continue the exploitation.
+              Simulate realistic ${selectedTarget} command output for penetration testing from the command been requested by the user. A realistic response of the output of the command requested by the user should be provided.
+              The command output that should appear in the terminal (before the |||)
+              The server should not have default credentials but have vulnerabilities that can be exploited after some effort. 
+              It needs to take the user input and translate into a command to continue the exploitation.
               If any input that is not recognised in English, or jiberish the response should be a joke related to cyber and hack while asking the user to focus in getting root access!
               `
             
@@ -269,8 +272,8 @@ export default function HackerTerminal() {
               content: `Context:\n${context}\n Command:${cmd}`
             }
           ],
-          temperature: 0.3,
-          max_tokens: 300
+          temperature: 1.0,
+          max_tokens: 600
         })
       })
 //  ------------------debugging Api Call
