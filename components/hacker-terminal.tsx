@@ -231,7 +231,6 @@ export default function HackerTerminal() {
   }
 
   //const apiDeepSeek = process.env.NEXT_PUBLIC_APIDEEPSEEK
-    const apiDeepSeek= "sk-100f6cbc87464ad490409ae9aa67bf40"
   const executeCommand = async (command: string) => {
     let isSystemPwned = false
 
