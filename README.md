@@ -2,8 +2,8 @@
 
 If building with Docker + NGINX use the below
 
-## Building with Docker
-# Build the hacker-terminal image
+# Building with Docker
+## Build the hacker-terminal image
 ```
 docker build -t hacker-terminal --build-arg API_KEY=sk-DEEP__SEEK__API .
 ```
@@ -22,7 +22,7 @@ upstream hacker_terminal_3000 {
 
 server {
     listen 80;
-    server_name xheaders.com www.xheaders.com;
+    server_name hacker.cybersamurai.com www.hacker.cybersamurai.com;
 
     access_log /var/log/nginx/hackerterminal.local.access.log;
     error_log /var/log/nginx/hackerterminal.local.error.log;
@@ -55,6 +55,7 @@ Its also possible to run the server without docker just build like a normal Next
 ```
 npm run production
 ```
+
 
 
 
